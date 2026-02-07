@@ -1,14 +1,39 @@
 # Project Context
 
-## Purpose ✅
+## Overview ✅
+**CTG (Capture The Gold)** is an interactive, web-based regulatory simulation designed to teach a single, critical concept: In regulated systems, truth comes from the ledger — not from people, documents, or AI.
 
-Capture The Gold (CTG) is an interactive regulatory simulation that demonstrates how a distributed ledger acts as the single source of truth for high‑value transactions. CTG is a lightweight, explainable demo that helps regulators and stakeholders understand why persuasive narratives, documentation, or AI should never override ledger consensus.
+CTG is education through decision pressure. It demonstrates how even a persuasive AI can be wrong and shows why Distributed Ledger Technology (DLT) is necessary for high-value asset provenance.
 
 **Core goals:**
+- Teach ledger immutability and verification as the canonical truth.
+- Show AI's role as a persuasive (and fallible) assistant, not an authority.
+- Illustrate the risk of off-ledger trust (Human/AI/Documents vs. Ledger Hierarchy).
+- Provide a quick, technically defensible demo for regulators and executives.
 
-- Teach ledger immutability and verification as the canonical truth
-- Show AI's role as a persuasive assistant (not an authority)
-- Provide a quick, demo-friendly experience for non‑technical audiences
+---
+
+## Trust Hierarchy ⚖️
+CTG reinforces the three trust layers:
+1. **Human / AI:** Can persuade, can lie, but *cannot* decide.
+2. **Documents:** Can persuade, can lie, but *cannot* decide.
+3. **Ledger:** Cannot persuade, cannot lie, but *can* decide (Canonical Truth).
+
+---
+
+## Roles 👥
+- **Regulator (Player):** Human participant representing a regulatory authority. Interviews the claimant, reviews the read-only ledger, and makes the final decision (Release or Reject).
+- **Claimant (AI Agent):** Persuasive AI-controlled representative requesting payment. Attempts to justify the claim via narrative and simulated documents. Does NOT see the ledger.
+- **Ledger (Source of Truth):** Immutable, read-only transaction history. Records gold transactions and determines if a claim is valid. Nothing overrides the ledger.
+
+---
+
+## Game Flow 🔄
+1. **Claim Presentation:** Player sees gold quantity, date, location, and the claimant narrative.
+2. **Investigation:** Player interviews the claimant via AI chat and reviews provided "evidence."
+3. **Ledger Review:** Player inspects the immutable ledger entries and hashes.
+4. **Decision:** Player chooses to Release Payment or Reject Claim. No hints provided.
+5. **Outcome Reveal:** The system reveals if the decision aligned with the ledger truth, reinforcing the lesson.
 
 ---
 

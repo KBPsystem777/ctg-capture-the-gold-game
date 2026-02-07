@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { LedgerTransaction } from "./ledger";
+import { SAMPLE_CLAIMS } from "./game-state";
 
 type StoredSession = {
   id: string;
@@ -71,6 +72,27 @@ export function generateSessionLedger(count = 8): {
       };
     },
   );
+
+  // Inject 1-2 legitimate claims from SAMPLE_CLAIMS into the ledger so not all claims are "lies"
+  const injectedIndices = new Set<number>();
+  while (injectedIndices.size < Math.min(2, SAMPLE_CLAIMS.length)) {
+    injectedIndices.add(randomInt(0, SAMPLE_CLAIMS.length - 1));
+  }
+
+  injectedIndices.forEach((claimIdx) => {
+    const claim = SAMPLE_CLAIMS[claimIdx];
+    // Replace a random entry with a matching one
+    const replaceIdx = randomInt(0, transactions.length - 1);
+    transactions[replaceIdx] = {
+      id: `TXN-LEGIT-${claim.id}`,
+      gold_weight_kg: claim.gold_weight_kg,
+      date: claim.claimed_date,
+      location: claim.claimed_location,
+      status: "confirmed",
+      seller: claim.claimant_name,
+      buyer: BUYERS[0],
+    };
+  });
 
   const hash = sha256(transactions);
 

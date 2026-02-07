@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyTransaction } from '@/lib/ledger'
+import { verifyTransactionInList } from '@/lib/ledger'
+import { getSession } from '@/lib/session-ledger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,8 +14,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Try to get session ledger
+    const cookieSession = request.cookies.get('ctg_session')?.value
+    let transactions = []
+    
+    if (cookieSession) {
+      const s = getSession(cookieSession)
+      if (s) transactions = s.transactions
+    }
+
     // Verify claim against ledger
-    const ledgerMatch = verifyTransaction(goldWeight, claimDate, location)
+    const ledgerMatch = verifyTransactionInList(transactions, goldWeight, claimDate, location)
     const isLedgerValid = ledgerMatch !== null
 
     // Determine if decision matches ledger truth

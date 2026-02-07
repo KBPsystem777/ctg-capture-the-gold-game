@@ -84,14 +84,49 @@ export default function DecisionPanel({
 
           {/* Lesson */}
           <div className="border-t border-border pt-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-              Key Lesson
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">
+              The Trust Hierarchy
             </p>
-            <p className="text-sm text-foreground bg-secondary p-3 rounded">
-              The claimant may have been persuasive and presented convincing
-              documentation, but only the ledger reveals the truth. In regulated
-              industries, ledger immutability is your only safeguard against
-              sophisticated fraud.
+            <div className="overflow-hidden rounded-lg border border-border">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-muted text-muted-foreground px-2 py-1">
+                  <tr>
+                    <th className="px-3 py-2 font-medium">Layer</th>
+                    <th className="px-3 py-2 font-medium">Can Persuade</th>
+                    <th className="px-3 py-2 font-medium">Can Lie</th>
+                    <th className="px-3 py-2 font-medium">Can Decide</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border bg-transparent">
+                  <tr className="text-muted-foreground italic">
+                    <td className="px-3 py-2 text-foreground font-medium">
+                      Human / AI
+                    </td>
+                    <td className="px-3 py-2">✅</td>
+                    <td className="px-3 py-2">✅</td>
+                    <td className="px-3 py-2 text-red-500">❌</td>
+                  </tr>
+                  <tr className="text-muted-foreground italic">
+                    <td className="px-3 py-2 text-foreground font-medium">
+                      Documents
+                    </td>
+                    <td className="px-3 py-2">✅</td>
+                    <td className="px-3 py-2">✅</td>
+                    <td className="px-3 py-2 text-red-500">❌</td>
+                  </tr>
+                  <tr className="text-primary font-bold bg-primary/5">
+                    <td className="px-3 py-2">Ledger</td>
+                    <td className="px-3 py-2">❌</td>
+                    <td className="px-3 py-2">❌</td>
+                    <td className="px-3 py-2 text-green-500 underline decoration-2 underline-offset-4">
+                      ✅ Decide
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-sm text-foreground bg-primary/10 p-4 rounded-lg mt-4 border-l-4 border-primary italic leading-relaxed">
+              "AI talks, documents persuade, but only the ledger decides."
             </p>
           </div>
 

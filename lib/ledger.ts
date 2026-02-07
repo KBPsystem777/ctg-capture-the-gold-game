@@ -53,17 +53,27 @@ export function getLedger(): LedgerTransaction[] {
 }
 
 // Verify if a transaction exists (by ID or partial matching)
-export function verifyTransaction(
+export function verifyTransactionInList(
+  transactions: LedgerTransaction[],
   goldWeight: number,
   date: string,
   location: string
 ): LedgerTransaction | null {
   return (
-    LEDGER_TRANSACTIONS.find(
+    transactions.find(
       (tx) =>
         tx.gold_weight_kg === goldWeight &&
         tx.date === date &&
         tx.location.toLowerCase().includes(location.toLowerCase())
     ) || null
   )
+}
+
+// Legacy verification against static ledger
+export function verifyTransaction(
+  goldWeight: number,
+  date: string,
+  location: string
+): LedgerTransaction | null {
+  return verifyTransactionInList(LEDGER_TRANSACTIONS, goldWeight, date, location)
 }
