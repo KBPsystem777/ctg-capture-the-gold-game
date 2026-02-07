@@ -110,7 +110,7 @@ These conventions ensure consistency, testability, and maintainability.
 
 - **Ledger immutability:** Ledger is static (module-level constant or JSON); do NOT allow runtime mutation.
 - **AI constraints:** The claimant system prompt (constructed in `app/api/chat/route.ts`) explicitly forbids referencing ledger truth.
-- **Secret handling:** API keys and session secrets must be in environment variables (e.g., `OPENAI_API_KEY` server-side). Never commit keys.
+- **Secret handling:** API keys and session secrets must be in environment variables (e.g., `OPENAI_API_KEY` and `CLAIMANT_SYSTEM_PROMPT` server-side). Never commit keys or prompts that contain sensitive data.
 - **Compliance:** Treat demo data as examples; avoid using real private or sensitive financial data in demos.
 
 ---
@@ -129,9 +129,14 @@ These conventions ensure consistency, testability, and maintainability.
 - Dev server: `pnpm dev` → opens http://localhost:3000
 - Lint: `pnpm lint`
 - Build: `pnpm build`
-- (Add) Test: `pnpm test` (Jest + coverage — add scripts & config)
+- Test: `pnpm test` (Jest + coverage)
 
-> Tip: Add `test`, `test:coverage`, `format`, and `lint:fix` scripts to `package.json` if missing.
+**Environment variables**
+
+- `OPENAI_API_KEY` — server-side OpenAI/Azure key (required for AI chat)
+- `CLAIMANT_SYSTEM_PROMPT` — optional server-side system prompt template for the claimant agent (overrides the default prompt)
+
+> Tip: Add `format` and `lint:fix` scripts to `package.json` if missing.
 
 ---
 

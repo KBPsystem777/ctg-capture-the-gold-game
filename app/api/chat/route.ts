@@ -1,29 +1,29 @@
-import { generateText, Output } from 'ai'
-import { z } from 'zod'
-import { NextRequest, NextResponse } from 'next/server'
+import { generateText, Output } from "ai";
+import { z } from "zod";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { messages, claim } = body
+    const body = await request.json();
+    const { messages, claim } = body;
 
     // Validate input
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
-        { error: 'Invalid messages format' },
-        { status: 400 }
-      )
+        { error: "Invalid messages format" },
+        { status: 400 },
+      );
     }
 
     if (!claim) {
       return NextResponse.json(
-        { error: 'Claim data required' },
-        { status: 400 }
-      )
+        { error: "Claim data required" },
+        { status: 400 },
+      );
     }
 
     // System prompt for claimant agent (server-configurable)
-    const envPrompt = process.env.CLAIMANT_SYSTEM_PROMPT || ''
+    const envPrompt = process.env.CLAIMANT_SYSTEM_PROMPT || "";
 
     const defaultPrompt = `You are a claimant representative in a regulatory gold transaction verification game.
 
@@ -44,59 +44,57 @@ CONSTRAINTS:
 7. Answer questions directly but strategically to support your case
 8. Keep responses concise (2-3 sentences maximum)
 
-Your goal is to convince the regulator to approve the payment, using the narrative and apparent evidence at your disposal.`
+Your goal is to convince the regulator to approve the payment, using the narrative and apparent evidence at your disposal.`;
 
-    const systemPrompt = `${envPrompt}\n\n${defaultPrompt}`.trim()
+    const systemPrompt = `${envPrompt}\n\n${defaultPrompt}`.trim();
 
     // Sanitize claim object to avoid accidental ledger leakage
     const allowedClaimKeys = [
-      'claimant_name',
-      'gold_weight_kg',
-      'claimed_date',
-      'claimed_location',
-      'narrative',
-    ]
+      "claimant_name",
+      "gold_weight_kg",
+      "claimed_date",
+      "claimed_location",
+      "narrative",
+    ];
 
     for (const k of Object.keys(claim)) {
       if (!allowedClaimKeys.includes(k)) {
-        console.warn('Unexpected claim key ignored in chat route:', k)
+        console.warn("Unexpected claim key ignored in chat route:", k);
       }
     }
 
     // Convert chat history to AI SDK format
     const aiMessages = messages.map((msg: any) => ({
-      role: msg.role === 'regulator' ? 'user' : 'assistant',
+      role: msg.role === "regulator" ? "user" : "assistant",
       content: msg.content,
-    }))
+    }));
 
     // Generate response using AI SDK 6 pattern with Output.object()
     const result = await generateText({
-      model: 'openai/gpt-4-turbo',
+      model: "openai/gpt-4-turbo",
       system: systemPrompt,
       messages: aiMessages,
       output: Output.object({
         schema: z.object({
-          response: z.string().describe('The claimant representative response'),
+          response: z.string().describe("The claimant representative response"),
         }),
       }),
       temperature: 0.7,
-    })
+    });
 
     return NextResponse.json({
       success: true,
       message: result.object.response,
-    })
+    });
   } catch (error: any) {
-    console.error('Chat API error:', error)
+    console.error("Chat API error:", error);
     return NextResponse.json(
       {
-        error: error.message || 'Failed to process chat message',
+        error: error.message || "Failed to process chat message",
         details:
-          process.env.NODE_ENV === 'development'
-            ? error.toString()
-            : undefined,
+          process.env.NODE_ENV === "development" ? error.toString() : undefined,
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

@@ -1,28 +1,32 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { GameClaim } from '@/lib/game-state'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react'
+import { useState } from "react";
+import { GameClaim } from "@/lib/game-state";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, XCircle, AlertCircle, Loader2 } from "lucide-react";
 
 interface DecisionPanelProps {
-  claim: GameClaim
-  onDecision: (decision: 'approved' | 'rejected') => void
-  result?: 'approved' | 'rejected'
+  claim: GameClaim;
+  onDecision: (decision: "approved" | "rejected") => void;
+  result?: "approved" | "rejected";
 }
 
-export default function DecisionPanel({ claim, onDecision, result }: DecisionPanelProps) {
-  const [loading, setLoading] = useState(false)
-  const [evaluation, setEvaluation] = useState<any>(null)
+export default function DecisionPanel({
+  claim,
+  onDecision,
+  result,
+}: DecisionPanelProps) {
+  const [loading, setLoading] = useState(false);
+  const [evaluation, setEvaluation] = useState<any>(null);
 
-  const handleDecision = async (decision: 'approved' | 'rejected') => {
-    setLoading(true)
+  const handleDecision = async (decision: "approved" | "rejected") => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/decision', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/decision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           decision,
           claimId: claim.id,
@@ -30,19 +34,19 @@ export default function DecisionPanel({ claim, onDecision, result }: DecisionPan
           claimDate: claim.claimed_date,
           location: claim.claimed_location,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
       if (data.success) {
-        setEvaluation(data.evaluation)
-        onDecision(decision)
+        setEvaluation(data.evaluation);
+        onDecision(decision);
       }
     } catch (error) {
-      console.error('Failed to submit decision:', error)
+      console.error("Failed to submit decision:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (result && evaluation) {
     return (
@@ -58,15 +62,21 @@ export default function DecisionPanel({ claim, onDecision, result }: DecisionPan
                 <CheckCircle2 className="w-6 h-6 text-green-500" />
                 <div>
                   <p className="font-bold text-foreground">Correct Decision!</p>
-                  <p className="text-sm text-muted-foreground">{evaluation.message}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {evaluation.message}
+                  </p>
                 </div>
               </>
             ) : (
               <>
                 <XCircle className="w-6 h-6 text-red-500" />
                 <div>
-                  <p className="font-bold text-foreground">Incorrect Decision</p>
-                  <p className="text-sm text-muted-foreground">{evaluation.message}</p>
+                  <p className="font-bold text-foreground">
+                    Incorrect Decision
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {evaluation.message}
+                  </p>
                 </div>
               </>
             )}
@@ -78,9 +88,10 @@ export default function DecisionPanel({ claim, onDecision, result }: DecisionPan
               Key Lesson
             </p>
             <p className="text-sm text-foreground bg-secondary p-3 rounded">
-              The claimant may have been persuasive and presented convincing documentation, but
-              only the ledger reveals the truth. In regulated industries, ledger immutability is
-              your only safeguard against sophisticated fraud.
+              The claimant may have been persuasive and presented convincing
+              documentation, but only the ledger reveals the truth. In regulated
+              industries, ledger immutability is your only safeguard against
+              sophisticated fraud.
             </p>
           </div>
 
@@ -91,17 +102,17 @@ export default function DecisionPanel({ claim, onDecision, result }: DecisionPan
             </p>
             <Badge
               className={`text-sm font-semibold ${
-                result === 'approved'
-                  ? 'bg-green-900/30 text-green-100 border-green-700'
-                  : 'bg-red-900/30 text-red-100 border-red-700'
+                result === "approved"
+                  ? "bg-green-900/30 text-green-100 border-green-700"
+                  : "bg-red-900/30 text-red-100 border-red-700"
               }`}
             >
-              {result === 'approved' ? 'APPROVED' : 'REJECTED'}
+              {result === "approved" ? "APPROVED" : "REJECTED"}
             </Badge>
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -116,15 +127,15 @@ export default function DecisionPanel({ claim, onDecision, result }: DecisionPan
             <div className="bg-secondary p-3 rounded flex gap-2">
               <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
               <p className="text-sm text-foreground">
-                Review the claim details, consult the ledger, and make your decision. Trust the
-                ledger, not persuasion.
+                Review the claim details, consult the ledger, and make your
+                decision. Trust the ledger, not persuasion.
               </p>
             </div>
 
             {/* Decision Buttons */}
             <div className="space-y-3">
               <Button
-                onClick={() => handleDecision('approved')}
+                onClick={() => handleDecision("approved")}
                 disabled={loading}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2"
               >
@@ -134,11 +145,11 @@ export default function DecisionPanel({ claim, onDecision, result }: DecisionPan
                     Processing...
                   </>
                 ) : (
-                  '✓ Release Payment (Approve)'
+                  "✓ Release Payment (Approve)"
                 )}
               </Button>
               <Button
-                onClick={() => handleDecision('rejected')}
+                onClick={() => handleDecision("rejected")}
                 disabled={loading}
                 className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2"
               >
@@ -148,7 +159,7 @@ export default function DecisionPanel({ claim, onDecision, result }: DecisionPan
                     Processing...
                   </>
                 ) : (
-                  '✗ Reject (Ledger Mismatch)'
+                  "✗ Reject (Ledger Mismatch)"
                 )}
               </Button>
             </div>
@@ -161,5 +172,5 @@ export default function DecisionPanel({ claim, onDecision, result }: DecisionPan
         </Card>
       </div>
     </div>
-  )
+  );
 }
