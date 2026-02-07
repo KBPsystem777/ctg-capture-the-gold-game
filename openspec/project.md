@@ -1,11 +1,13 @@
 # Project Context
 
 ## Overview ✅
+
 **CTG (Capture The Gold)** is an interactive, web-based regulatory simulation designed to teach a single, critical concept: In regulated systems, truth comes from the ledger — not from people, documents, or AI.
 
 CTG is education through decision pressure. It demonstrates how even a persuasive AI can be wrong and shows why Distributed Ledger Technology (DLT) is necessary for high-value asset provenance.
 
 **Core goals:**
+
 - Teach ledger immutability and verification as the canonical truth.
 - Show AI's role as a persuasive (and fallible) assistant, not an authority.
 - Illustrate the risk of off-ledger trust (Human/AI/Documents vs. Ledger Hierarchy).
@@ -14,14 +16,17 @@ CTG is education through decision pressure. It demonstrates how even a persuasiv
 ---
 
 ## Trust Hierarchy ⚖️
+
 CTG reinforces the three trust layers:
-1. **Human / AI:** Can persuade, can lie, but *cannot* decide.
-2. **Documents:** Can persuade, can lie, but *cannot* decide.
-3. **Ledger:** Cannot persuade, cannot lie, but *can* decide (Canonical Truth).
+
+1. **Human / AI:** Can persuade, can lie, but _cannot_ decide.
+2. **Documents:** Can persuade, can lie, but _cannot_ decide.
+3. **Ledger:** Cannot persuade, cannot lie, but _can_ decide (Canonical Truth).
 
 ---
 
 ## Roles 👥
+
 - **Regulator (Player):** Human participant representing a regulatory authority. Interviews the claimant, reviews the read-only ledger, and makes the final decision (Release or Reject).
 - **Claimant (AI Agent):** Persuasive AI-controlled representative requesting payment. Attempts to justify the claim via narrative and simulated documents. Does NOT see the ledger.
 - **Ledger (Source of Truth):** Immutable, read-only transaction history. Records gold transactions and determines if a claim is valid. Nothing overrides the ledger.
@@ -29,6 +34,7 @@ CTG reinforces the three trust layers:
 ---
 
 ## Game Flow 🔄
+
 1. **Claim Presentation:** Player sees gold quantity, date, location, and the claimant narrative.
 2. **Investigation:** Player interviews the claimant via AI chat and reviews provided "evidence."
 3. **Ledger Review:** Player inspects the immutable ledger entries and hashes.
@@ -74,14 +80,13 @@ These conventions ensure consistency, testability, and maintainability.
 - Minimize re-renders (memoize derived data, pass stable callbacks via `useCallback`).
 - Lazy‑load non-critical UI (dynamic imports for heavy modules).
 
-### Documentation
+### UI & Responsive Design
 
-- Keep implementation notes in `openspec/` for design rationale and change proposals.
-- Add short usage examples in JSDoc for complex functions and components.
+- **Mobile-First Tabs**: On narrow viewports (< 1024px), the main interface uses a tabbed navigation (Details, Chat, Verify) to prevent vertical bloat.
+- **Color Palette**: Primary `#005D9F`, Background `#FBFCFD`.
+- **Target Sizes**: Minimum 44px tap targets for all interactive elements.
 
----
-
-## Architecture Patterns 🏗️
+### Architecture Patterns 🏗️
 
 - **App Router** for pages and layouts. Keep page logic minimal; business logic belongs in `lib/`.
 - **API Routes** (server-only actions):

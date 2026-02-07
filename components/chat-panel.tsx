@@ -69,23 +69,23 @@ export default function ChatPanel({ claim }: ChatPanelProps) {
   }
 
   return (
-    <Card className="bg-card border-border h-full flex flex-col">
-      <CardHeader>
-        <CardTitle className="text-accent">Chat with Claimant</CardTitle>
+    <Card className="bg-card border-border h-full flex flex-col shadow-sm">
+      <CardHeader className="py-3 px-4 md:py-4 md:px-6">
+        <CardTitle className="text-[#005D9F] text-lg md:text-xl">Chat with Claimant</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col min-h-96">
+      <CardContent className="flex-1 flex flex-col p-4 md:p-6 overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-2">
+        <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 hover:scrollbar-thumb-muted-foreground/40 h-[400px] md:h-auto">
           {messages.map((msg, idx) => (
             <div
               key={idx}
               className={`flex ${msg.role === 'regulator' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                   msg.role === 'regulator'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-foreground'
+                    ? 'bg-[#005D9F] text-white rounded-tr-none shadow-sm'
+                    : 'bg-muted text-foreground rounded-tl-none border border-border/50 shadow-sm'
                 }`}
               >
                 {msg.content}
@@ -94,9 +94,13 @@ export default function ChatPanel({ claim }: ChatPanelProps) {
           ))}
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-secondary text-foreground px-3 py-2 rounded-lg flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Claimant is responding...</span>
+              <div className="bg-muted text-foreground px-4 py-3 rounded-2xl rounded-tl-none border border-border/50 flex items-center gap-3 shadow-sm">
+                <div className="flex gap-1">
+                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce"></span>
+                </div>
+                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Claimant is typing</span>
               </div>
             </div>
           )}
@@ -104,20 +108,21 @@ export default function ChatPanel({ claim }: ChatPanelProps) {
         </div>
 
         {/* Input */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 pt-2 border-t border-border/50">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Ask a question..."
+            placeholder="Review documents or ask about their claim..."
             disabled={loading}
-            className="flex-1 bg-input text-foreground placeholder-muted-foreground px-3 py-2 rounded border border-border focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+            className="flex-1 bg-muted/30 text-foreground placeholder-muted-foreground px-4 py-2.5 rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50 text-sm transition-all shadow-inner"
           />
           <Button
             onClick={handleSendMessage}
             disabled={loading || !input.trim()}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50"
+            size="icon"
+            className="bg-[#005D9F] hover:bg-[#004a80] text-white rounded-full h-10 w-10 shrink-0 shadow-sm transition-transform active:scale-95"
           >
             <Send className="w-4 h-4" />
           </Button>

@@ -2,7 +2,7 @@
 
 1. Session-Aware Decision Logic
    - [x] Update `app/api/decision/route.ts` to retrieve the session id from the `ctg_session` cookie.
-   - [x] Use `getSession(id)` from `lib/session-ledger.ts` to verify the claim against the *session* ledger.
+   - [x] Use `getSession(id)` from `lib/session-ledger.ts` to verify the claim against the _session_ ledger.
    - [x] Update `verifyTransaction` (or a session variant) to work with the `LedgerTransaction[]` from the session.
    - Validation: A correct decision on a randomized ledger results in `regulatorCorrect: true`.
 

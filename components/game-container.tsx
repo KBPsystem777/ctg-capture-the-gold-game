@@ -7,6 +7,7 @@ import ChatPanel from "./chat-panel";
 import ClaimPanel from "./claim-panel";
 import DecisionPanel from "./decision-panel";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface GameContainerProps {
   claimId: string;
@@ -54,11 +55,11 @@ export default function GameContainer({
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 md:p-6">
+    <div className="min-h-screen bg-[#FBFCFD] text-foreground p-4 md:p-6 pb-24">
       {/* Header */}
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-primary">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#005D9F]">
             C2G: Regulatory Desk
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
@@ -82,20 +83,20 @@ export default function GameContainer({
         </Button>
       </div>
 
-      {/* Main Grid - Responsive Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
+      {/* Main Grid - Desktop Layout */}
+      <div className="hidden lg:grid grid-cols-3 gap-6 auto-rows-max">
         {/* Left Column: Claim & Documents */}
-        <div className="md:col-span-1 space-y-4">
+        <div className="space-y-4">
           <ClaimPanel claim={claim} />
         </div>
 
         {/* Middle Column: Chat */}
-        <div className="md:col-span-1 space-y-4">
+        <div className="space-y-4">
           <ChatPanel claim={claim} />
         </div>
 
         {/* Right Column: Ledger & Decision */}
-        <div className="md:col-span-2 lg:col-span-1 space-y-4">
+        <div className="space-y-4">
           <LedgerPanel />
           {!showResult && (
             <DecisionPanel
@@ -114,6 +115,45 @@ export default function GameContainer({
             />
           )}
         </div>
+      </div>
+
+      {/* Mobile/Tablet Layout - Tabs */}
+      <div className="lg:hidden">
+        <Tabs defaultValue="chat" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="chat">Chat</TabsTrigger>
+            <TabsTrigger value="verify">Verify</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="details" className="space-y-4">
+            <ClaimPanel claim={claim} />
+          </TabsContent>
+          
+          <TabsContent value="chat" className="space-y-4">
+            <ChatPanel claim={claim} />
+          </TabsContent>
+          
+          <TabsContent value="verify" className="space-y-4">
+            <LedgerPanel />
+            {!showResult && (
+              <DecisionPanel
+                claim={claim}
+                onDecision={(d) => {
+                  setDecision(d);
+                  setShowResult(true);
+                }}
+              />
+            )}
+            {showResult && decision && (
+              <DecisionPanel
+                claim={claim}
+                onDecision={setDecision}
+                result={decision}
+              />
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
