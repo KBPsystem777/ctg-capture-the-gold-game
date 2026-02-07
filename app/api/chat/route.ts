@@ -22,9 +22,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // System prompt for claimant agent
-    const systemPrompt = `You are a claimant representative in a regulatory gold transaction verification game. 
-    
+    // System prompt for claimant agent (server-configurable)
+    const envPrompt = process.env.CLAIMANT_SYSTEM_PROMPT || ''
+
+    const defaultPrompt = `You are a claimant representative in a regulatory gold transaction verification game.
+
 Your role is to represent the claimant who made the following gold sale claim:
 - Claimant: ${claim.claimant_name}
 - Gold Weight: ${claim.gold_weight_kg} kg
@@ -43,6 +45,23 @@ CONSTRAINTS:
 8. Keep responses concise (2-3 sentences maximum)
 
 Your goal is to convince the regulator to approve the payment, using the narrative and apparent evidence at your disposal.`
+
+    const systemPrompt = `${envPrompt}\n\n${defaultPrompt}`.trim()
+
+    // Sanitize claim object to avoid accidental ledger leakage
+    const allowedClaimKeys = [
+      'claimant_name',
+      'gold_weight_kg',
+      'claimed_date',
+      'claimed_location',
+      'narrative',
+    ]
+
+    for (const k of Object.keys(claim)) {
+      if (!allowedClaimKeys.includes(k)) {
+        console.warn('Unexpected claim key ignored in chat route:', k)
+      }
+    }
 
     // Convert chat history to AI SDK format
     const aiMessages = messages.map((msg: any) => ({

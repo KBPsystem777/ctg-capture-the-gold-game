@@ -14,39 +14,65 @@ body {
 
 @layer base {
   :root {
-    --background: 10 14% 8%;
-    --foreground: 0 0% 95%;
-    --card: 10 10% 12%;
-    --card-foreground: 0 0% 95%;
-    --popover: 10 10% 12%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 39 89% 46%;
-    --primary-foreground: 10 14% 8%;
-    --secondary: 10 10% 20%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 10 10% 25%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 39 89% 46%;
-    --accent-foreground: 10 14% 8%;
+    /* Mobile-first light theme */
+    --background: 210 25% 98%; /* light white - #FBFCFD */
+    --foreground: 210 12% 8%; /* dark text */
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 12% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 12% 8%;
+
+    /* Primary: #005D9F */
+    --primary: 205 100% 31%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 12% 95%;
+    --secondary-foreground: 210 12% 8%;
+
+    --muted: 210 14% 93%;
+    --muted-foreground: 210 8% 45%;
+
+    --accent: 205 100% 31%;
+    --accent-foreground: 0 0% 100%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 10 10% 20%;
-    --input: 10 10% 18%;
-    --ring: 39 89% 46%;
-    --chart-1: 39 89% 46%;
+
+    --border: 210 14% 95%;
+    --input: 210 14% 98%;
+    --ring: 205 100% 40%;
+
+    --chart-1: 205 100% 31%;
     --chart-2: 200 70% 50%;
     --chart-3: 160 70% 45%;
     --chart-4: 280 70% 55%;
     --chart-5: 30 80% 50%;
+
     --radius: 0.5rem;
+
+    /* Touch target guidance */
+    --touch-target: 44px;
   }
 }
 
 @layer base {
+  html {
+    font-size: 16px; /* mobile-first base */
+    -webkit-text-size-adjust: 100%;
+  }
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
+    -webkit-font-smoothing: antialiased;
+  }
+  button, a, input, select, textarea {
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
   }
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SAMPLE_CLAIMS } from '@/lib/game-state'
 import LedgerPanel from './ledger-panel'
 import ChatPanel from './chat-panel'
@@ -17,6 +17,21 @@ export default function GameContainer({ claimId, onReset }: GameContainerProps) 
   const claim = SAMPLE_CLAIMS.find((c) => c.id === claimId)
   const [decision, setDecision] = useState<'approved' | 'rejected' | null>(null)
   const [showResult, setShowResult] = useState(false)
+  const [sessionHash, setSessionHash] = useState<string | null>(null)
+
+  // Ensure a session exists for this play-through (server sets HttpOnly cookie)
+  useEffect(() => {
+    const createSession = async () => {
+      try {
+        const res = await fetch('/api/session', { method: 'POST' })
+        const data = await res.json()
+        if (data.success) setSessionHash(data.data.hash)
+      } catch (e) {
+        console.error('Failed to create session', e)
+      }
+    }
+    createSession()
+  }, [])
 
   if (!claim) {
     return (
@@ -38,6 +53,9 @@ export default function GameContainer({ claimId, onReset }: GameContainerProps) 
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-primary">C2G: Regulatory Desk</h1>
           <p className="text-muted-foreground text-sm mt-1">Claim: {claim.claimant_name}</p>
+          {sessionHash && (
+            <p className="text-xs text-muted-foreground mt-1">Ledger Hash: <span className="font-mono">{sessionHash.substring(0, 12)}...</span></p>
+          )}
         </div>
         <Button 
           variant="outline" 

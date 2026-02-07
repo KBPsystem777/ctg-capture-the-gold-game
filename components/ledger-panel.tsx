@@ -19,10 +19,12 @@ export default function LedgerPanel() {
   const [ledger, setLedger] = useState<LedgerTransaction[]>([])
   const [hash, setHash] = useState<string>('')
   const [loading, setLoading] = useState(true)
+  const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
     const fetchLedger = async () => {
       try {
+        // The server will resolve session from cookie or query param; use default behavior for now
         const response = await fetch('/api/ledger')
         const data = await response.json()
         if (data.success) {
@@ -70,10 +72,22 @@ export default function LedgerPanel() {
 
             {/* Transactions */}
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-                Recorded Transactions ({ledger.length})
-              </p>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                  Recorded Transactions ({ledger.length})
+                </p>
+                {/* Toggle on mobile */}
+                <div className="md:hidden">
+                  <button
+                    onClick={() => setExpanded((s) => !s)}
+                    className="text-sm text-primary underline"
+                  >
+                    {expanded ? 'Hide' : 'Inspect ledger'}
+                  </button>
+                </div>
+              </div>
+
+              <div className={`${expanded ? 'block' : 'hidden md:block'} space-y-3 max-h-96 overflow-y-auto`}>
                 {ledger.map((tx) => (
                   <div key={tx.id} className="bg-secondary p-3 rounded border border-border">
                     <div className="flex justify-between items-start mb-2">

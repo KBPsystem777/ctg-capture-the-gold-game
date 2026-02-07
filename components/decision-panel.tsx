@@ -105,57 +105,61 @@ export default function DecisionPanel({ claim, onDecision, result }: DecisionPan
   }
 
   return (
-    <Card className="bg-card border-border">
-      <CardHeader>
-        <CardTitle className="text-accent">Make Decision</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Instructions */}
-        <div className="bg-secondary p-3 rounded flex gap-2">
-          <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-foreground">
-            Review the claim details, consult the ledger, and make your decision. Trust the
-            ledger, not persuasion.
-          </p>
-        </div>
+    <div className="md:static fixed bottom-0 left-0 right-0 z-50 p-4 md:p-0 md:mb-0">
+      <div className="mx-auto max-w-3xl">
+        <Card className="bg-card border-border rounded-t-lg shadow-lg md:rounded">
+          <CardHeader>
+            <CardTitle className="text-accent">Make Decision</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Instructions */}
+            <div className="bg-secondary p-3 rounded flex gap-2">
+              <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-foreground">
+                Review the claim details, consult the ledger, and make your decision. Trust the
+                ledger, not persuasion.
+              </p>
+            </div>
 
-        {/* Decision Buttons */}
-        <div className="space-y-3">
-          <Button
-            onClick={() => handleDecision('approved')}
-            disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              '✓ Release Payment (Approve)'
-            )}
-          </Button>
-          <Button
-            onClick={() => handleDecision('rejected')}
-            disabled={loading}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              '✗ Reject (Ledger Mismatch)'
-            )}
-          </Button>
-        </div>
+            {/* Decision Buttons */}
+            <div className="space-y-3">
+              <Button
+                onClick={() => handleDecision('approved')}
+                disabled={loading}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  '✓ Release Payment (Approve)'
+                )}
+              </Button>
+              <Button
+                onClick={() => handleDecision('rejected')}
+                disabled={loading}
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  '✗ Reject (Ledger Mismatch)'
+                )}
+              </Button>
+            </div>
 
-        {/* Warning */}
-        <div className="text-xs text-muted-foreground text-center">
-          This decision is final. Choose wisely.
-        </div>
-      </CardContent>
-    </Card>
+            {/* Warning */}
+            <div className="text-xs text-muted-foreground text-center">
+              This decision is final. Choose wisely.
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   )
 }
