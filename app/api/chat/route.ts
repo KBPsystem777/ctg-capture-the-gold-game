@@ -1,6 +1,9 @@
-import { generateText, Output } from "ai";
-import { z } from "zod";
+import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,7 +79,13 @@ You are not a regulator, auditor, or the ledger. You are an interested party att
 - Speaking to a regulator (e.g., BSP). Formal, high-value transaction.
 
 10. START CONDITION
-- Respond only after addressed. Stay in character.`;
+- Respond only after addressed. Stay in character.
+
+IMPORTANT: You must respond in valid JSON format.
+Example response format:
+{
+  "response": "Your message content here"
+}`;
 
     const systemPrompt = `${envPrompt}\n\n${defaultPrompt}`.trim();
 
@@ -88,7 +97,7 @@ You are not a regulator, auditor, or the ledger. You are an interested party att
       "claimed_location",
       "narrative",
       "id",
-      "documents"
+      "documents",
     ];
 
     for (const k of Object.keys(claim)) {
@@ -97,31 +106,31 @@ You are not a regulator, auditor, or the ledger. You are an interested party att
       }
     }
 
-    // Convert chat history to AI SDK format with robust role mapping
-    const aiMessages = messages.map((msg: any) => {
-      const role = msg.role.toLowerCase();
-      return {
-        role: (role === "regulator" || role === "user") ? "user" : "assistant",
-        content: msg.content,
-      };
-    });
-
-    // Generate response using AI SDK 6 pattern with Output.object()
-    const result = await generateText({
-      model: "openai/gpt-4-turbo", // Maintaining OpenAI but with the updated instructions
-      system: systemPrompt,
-      messages: aiMessages,
-      output: Output.object({
-        schema: z.object({
-          response: z.string().describe("The claimant representative response"),
-        }),
+    // Convert chat history to OpenAI format with robust role mapping
+    const aiMessages = [
+      { role: "system", content: systemPrompt },
+      ...messages.map((msg: any) => {
+        const role = msg.role.toLowerCase();
+        return {
+          role: role === "regulator" || role === "user" ? "user" : "assistant",
+          content: msg.content,
+        };
       }),
+    ];
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4-turbo-preview",
+      messages: aiMessages as any,
+      response_format: { type: "json_object" },
       temperature: 0.7,
     });
 
+    const rawContent = response.choices[0].message?.content || "{}";
+    const parsed = JSON.parse(rawContent);
+
     return NextResponse.json({
       success: true,
-      message: result.object.response,
+      message: parsed.response || "No response received from agent.",
     });
   } catch (error: any) {
     console.error("Chat API error:", error);

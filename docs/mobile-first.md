@@ -1,6 +1,12 @@
-# Mobile-first & Session Ledger Notes
+## Mobile-first & Session Ledger Notes
 
 This document summarizes the mobile-first decisions and how session-scoped ledgers work.
+
+## Mobile Viewport & Accessibility
+
+- The viewport meta tag in `app/layout.tsx` is set to `width=device-width, initial-scale=1, maximum-scale=1`.
+- **Reasoning**: This prevents the mobile browser from automatically zooming in when input fields receive focus, which often disrupts the UI and leaves the user in an awkward zoom state.
+- **Accessibility Trade-off**: Disabling user-initiated zoom (`maximum-scale=1`) can be a barrier for users with visual impairments who rely on pinch-to-zoom. In a production environment, we would ideally avoid zoom by ensuring all inputs have a font size of at least 16px, or by providing an accessibility toggle to re-enable zoom. For this simulation, the fixed-scale UI was prioritized for the "kiosk" feel requested.
 
 ## Theme & UI
 

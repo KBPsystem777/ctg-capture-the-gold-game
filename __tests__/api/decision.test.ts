@@ -37,6 +37,8 @@ describe("Decision API", () => {
 
     expect(data.success).toBe(true);
     expect(data.evaluation.regulatorCorrect).toBe(true);
+    expect(typeof data.evaluation.explanation).toBe("string");
+    expect(Array.isArray(data.evaluation.basis?.matchedFields)).toBe(true);
   });
 
   it("identifies an incorrect approval for a non-existent transaction", async () => {
@@ -54,5 +56,7 @@ describe("Decision API", () => {
 
     expect(data.success).toBe(true);
     expect(data.evaluation.regulatorCorrect).toBe(false);
+    expect(typeof data.evaluation.explanation).toBe("string");
+    expect(Array.isArray(data.evaluation.basis?.closestMatches)).toBe(true);
   });
 });

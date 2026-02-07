@@ -1,9 +1,14 @@
-import { createSession } from "@/lib/session-ledger";
+import { createSession, createSessionWithAI } from "@/lib/session-ledger";
 import { NextResponse } from "next/server";
 
 export async function POST() {
   try {
-    const session = createSession();
+    const count = Math.floor(Math.random() * 4) + 4; // 4 to 7 transactions for variety
+
+    // Prefer AI-generated Philippine-context ledgers when an OpenAI key is configured
+    const session = process.env.OPENAI_API_KEY
+      ? await createSessionWithAI(count)
+      : createSession(count);
 
     const res = NextResponse.json({
       success: true,

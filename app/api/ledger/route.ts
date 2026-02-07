@@ -1,4 +1,3 @@
-import { getLedger, getLedgerHash } from "@/lib/ledger";
 import { getSession } from "@/lib/session-ledger";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -6,25 +5,46 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const sessionParam = url.searchParams.get("session");
-    let transactions = getLedger();
-    let hash = getLedgerHash();
 
-    // Try session by query param first
+    // Require an explicit session (either via query param or cookie)
+    let transactions: any = [];
+    let hash: string | null = null;
+
     if (sessionParam) {
       const s = getSession(sessionParam);
       if (s) {
         transactions = s.transactions;
         hash = s.hash;
+      } else {
+        return NextResponse.json(
+          { success: false, error: "Session not found" },
+          { status: 404 },
+        );
       }
     } else {
       // Try cookie
-      const cookieSession = request.cookies.get("ctg_session")?.value;
+      const rawCookie = request.cookies.get("ctg_session")?.value;
+      const cookieSession = rawCookie?.trim();
+
       if (cookieSession) {
         const s = getSession(cookieSession);
         if (s) {
           transactions = s.transactions;
           hash = s.hash;
+        } else {
+          return NextResponse.json(
+            { success: false, error: "Session expired or not found" },
+            { status: 404 },
+          );
         }
+      } else {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Session required. Create a session via POST /api/session.",
+          },
+          { status: 400 },
+        );
       }
     }
 

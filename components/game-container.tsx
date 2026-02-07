@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SAMPLE_CLAIMS } from "@/lib/game-state";
 import LedgerPanel from "./ledger-panel";
 import ChatPanel from "./chat-panel";
 import ClaimPanel from "./claim-panel";
 import DecisionPanel from "./decision-panel";
+import QuickDecisionBar from "./quick-decision-bar";
+import DecisionModal from "./decision-modal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Info, MessageSquare, ShieldCheck } from "lucide-react";
 
 interface GameContainerProps {
   claimId: string;
@@ -23,21 +26,70 @@ export default function GameContainer({
     null,
   );
   const [showResult, setShowResult] = useState(false);
+  const [evaluation, setEvaluation] = useState<any>(null);
+  const [decisionLoading, setDecisionLoading] = useState(false);
   const [sessionHash, setSessionHash] = useState<string | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [showDecisionModal, setShowDecisionModal] = useState(false);
+  const initialized = useRef(false);
 
   // Ensure a session exists for this play-through (server sets HttpOnly cookie)
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
     const createSession = async () => {
+      setSessionLoading(true);
       try {
         const res = await fetch("/api/session", { method: "POST" });
         const data = await res.json();
         if (data.success) setSessionHash(data.data.hash);
       } catch (e) {
         console.error("Failed to create session", e);
+      } finally {
+        setSessionLoading(false);
       }
     };
     createSession();
   }, []);
+
+  const [activeTab, setActiveTab] = useState<"details" | "chat" | "verify">(
+    "chat",
+  );
+
+  // Submit decision (centralized) so evaluation can be lifted to parent state
+  const submitDecision = async (decisionVal: "approved" | "rejected") => {
+    setDecisionLoading(true);
+    try {
+      const res = await fetch("/api/decision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          decision: decisionVal,
+          claimId: claim.id,
+          goldWeight: claim.gold_weight_kg,
+          claimDate: claim.claimed_date,
+          location: claim.claimed_location,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setEvaluation(data.evaluation);
+        setDecision(decisionVal);
+        setShowResult(true);
+        // On mobile, switch to Verify tab so result is visible immediately
+        setActiveTab("verify"); // Auto-open the detailed explanation modal to emphasize ledger evidence
+        setShowDecisionModal(true);
+      } else {
+        console.error("Decision API returned an error", data);
+      }
+    } catch (err) {
+      console.error("Failed to submit decision", err);
+    } finally {
+      setDecisionLoading(false);
+    }
+  };
 
   if (!claim) {
     return (
@@ -54,8 +106,28 @@ export default function GameContainer({
     );
   }
 
+  if (sessionLoading) {
+    return (
+      <div className="min-h-screen bg-[#FBFCFD] flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-white p-8 rounded-3xl shadow-xl border border-blue-50 max-w-sm w-full">
+          <div className="relative w-16 h-16 mx-auto mb-6">
+            <div className="absolute inset-0 rounded-full border-4 border-blue-100"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
+          </div>
+          <h2 className="text-xl font-bold text-[#005D9F] mb-2">
+            Initializing Audit...
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Contacting the central ledger to establish a secure regulatory
+            session.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#FBFCFD] text-foreground p-4 md:p-6 pb-24">
+    <div className="min-h-screen bg-[#FBFCFD] text-foreground p-4 md:p-6 pb-24 lg:pb-6">
       {/* Header */}
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -101,10 +173,8 @@ export default function GameContainer({
           {!showResult && (
             <DecisionPanel
               claim={claim}
-              onDecision={(d) => {
-                setDecision(d);
-                setShowResult(true);
-              }}
+              onDecision={(d) => submitDecision(d)}
+              loading={decisionLoading}
             />
           )}
           {showResult && decision && (
@@ -112,37 +182,68 @@ export default function GameContainer({
               claim={claim}
               onDecision={setDecision}
               result={decision}
+              evaluation={evaluation}
+              onShowExplanation={() => setShowDecisionModal(true)}
             />
           )}
+
+          <DecisionModal
+            open={showDecisionModal}
+            onOpenChange={setShowDecisionModal}
+            evaluation={evaluation}
+            claim={claim}
+            ledgerTransaction={evaluation?.ledgerMatch?.transaction || null}
+            sessionHash={sessionHash}
+          />
         </div>
       </div>
 
       {/* Mobile/Tablet Layout - Tabs */}
       <div className="lg:hidden">
-        <Tabs defaultValue="chat" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="chat">Chat</TabsTrigger>
-            <TabsTrigger value="verify">Verify</TabsTrigger>
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as any)}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 p-1 rounded-xl h-auto">
+            <TabsTrigger
+              value="details"
+              className="py-2.5 flex flex-col items-center gap-1 text-[10px] uppercase font-bold tracking-wider data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
+            >
+              <Info className="w-4 h-4" />
+              Details
+            </TabsTrigger>
+            <TabsTrigger
+              value="chat"
+              className="py-2.5 flex flex-col items-center gap-1 text-[10px] uppercase font-bold tracking-wider data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
+            >
+              <MessageSquare className="w-4 h-4" />
+              Chat
+            </TabsTrigger>
+            <TabsTrigger
+              value="verify"
+              className="py-2.5 flex flex-col items-center gap-1 text-[10px] uppercase font-bold tracking-wider data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              Verify
+            </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="details" className="space-y-4">
             <ClaimPanel claim={claim} />
           </TabsContent>
-          
+
           <TabsContent value="chat" className="space-y-4">
             <ChatPanel claim={claim} />
           </TabsContent>
-          
+
           <TabsContent value="verify" className="space-y-4">
             <LedgerPanel />
             {!showResult && (
               <DecisionPanel
                 claim={claim}
-                onDecision={(d) => {
-                  setDecision(d);
-                  setShowResult(true);
-                }}
+                onDecision={(d) => submitDecision(d)}
+                loading={decisionLoading}
               />
             )}
             {showResult && decision && (
@@ -150,10 +251,20 @@ export default function GameContainer({
                 claim={claim}
                 onDecision={setDecision}
                 result={decision}
+                evaluation={evaluation}
+                onShowExplanation={() => setShowDecisionModal(true)}
               />
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Quick decision bar for mobile - visible outside of the Verify tab to lower friction */}
+        {!showResult && (
+          <QuickDecisionBar
+            onAction={(d) => submitDecision(d)}
+            loading={decisionLoading}
+          />
+        )}
       </div>
     </div>
   );
