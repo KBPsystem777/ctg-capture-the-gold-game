@@ -13,3 +13,5 @@ node_modules/
 
 # ENVs
 .env
+.process.env
+*.env
